@@ -16,7 +16,7 @@ from typing import Callable, cast
 from backend.copilot import stream_registry
 from backend.copilot.baseline import stream_chat_completion_baseline
 from backend.copilot.config import ChatConfig, CopilotMode
-from backend.copilot.response_model import StreamError
+from backend.copilot.response_model import StreamError, StreamStatus
 from backend.copilot.sdk import service as sdk_service
 from backend.copilot.sdk.dummy import stream_chat_completion_dummy
 from backend.copilot.stream_heartbeat import wrap_stream_with_heartbeat
@@ -520,6 +520,18 @@ class CoPilotProcessor:
         error_msg = None
 
         try:
+            # Executor picked the turn up — replace the route's "Message
+            # received…" status while feature-flag resolution and service
+            # setup run.
+            try:
+                await stream_registry.publish_chunk(
+                    entry.turn_id,
+                    StreamStatus(message="Setting up your environment…"),
+                    session_id=entry.session_id,
+                )
+            except Exception:
+                log.warning("Failed to publish setup status chunk")
+
             # Choose service based on LaunchDarkly flag.
             # Claude Code subscription forces SDK mode (CLI subprocess auth).
             config = ChatConfig()
