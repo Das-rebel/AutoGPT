@@ -97,7 +97,10 @@ from backend.copilot.tools import TOOL_REGISTRY
 # ``{}`` and dropping it; nested props are kept type-only to minimise the spend.
 # Merged registry measures 50915 chars (incl. find_library_agent's
 # write_graph_to); ~580 headroom for wording tweaks.
-_CHAR_BUDGET = 51_500
+# Bumped 51500 -> 52_300 for the copilot tool-chain UI: ``ask_question`` is back
+# in TOOL_REGISTRY as a first-class tool (docked clarifying-question flow), so
+# its schema counts again. Registry measures 51723 chars; ~580 headroom kept.
+_CHAR_BUDGET = 52_300
 
 
 @pytest.fixture(scope="module")
