@@ -91,6 +91,7 @@ ProviderLiteral = Literal[
     "ollama",
     "open_router",
     "llama_api",
+    "a3m",
     "aiml_api",
     "v0",
 ]
@@ -391,6 +392,26 @@ async def _dispatch_sync(
             temperature=temperature,
             tools=None,  # AI/ML API path historically passes no tools
             force_json_output=False,
+            parallel_tool_calls=openai.omit,
+            timeout_seconds=timeout_seconds,
+            include_openrouter_extras=False,
+            default_headers={
+                "X-Project": "AutoGPT",
+                "X-Title": "AutoGPT",
+                "HTTP-Referer": "https://github.com/Significant-Gravitas/AutoGPT",
+            },
+        )
+    if provider == "a3m":
+        a3m_base = os.environ.get("A3M_BASE_URL", "http://localhost:8787").rstrip("/")
+        return await _call_openai_compat(
+            base_url=f"{a3m_base}/v1",
+            model=model,
+            api_key=api_key,
+            messages=messages,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            tools=tools,
+            force_json_output=force_json_output,
             parallel_tool_calls=openai.omit,
             timeout_seconds=timeout_seconds,
             include_openrouter_extras=False,
